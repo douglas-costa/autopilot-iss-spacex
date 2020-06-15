@@ -108,6 +108,24 @@ class PitchController extends Controller {
     }
 }
 
+class XController extends Controller {
+    constructor(decreaseButton, increaseButton) {
+        super(decreaseButton, increaseButton)
+    }
+
+    adjust() {
+        if (this.error >= -0.1 && this.error <= 0.1) {
+            this.stop()
+        }
+        else if (this.error < 0) {
+            this.decrease()
+        }
+        else if (this.error > 0) {
+            this.increase()
+        }
+    }
+}
+
 class YController extends Controller {
     constructor(decreaseButton, increaseButton) {
         super(decreaseButton, increaseButton)
@@ -149,14 +167,16 @@ class ZController extends Controller {
     let yawController   = new YAWController($('#yaw-left-button'), $('#yaw-right-button'))
     let pitchController = new PitchController($('#pitch-down-button'), $('#pitch-up-button'))
 
-    let yController     = new YController($('#translate-left-button'), $('#translate-right-button'))
-    let zController     = new ZController($('#translate-down-button'), $('#translate-up-button'))
+    let xController = new XController($('#translate-backward-button'), $('#translate-forward-button'))
+    let yController = new YController($('#translate-left-button'), $('#translate-right-button'))
+    let zController = new ZController($('#translate-down-button'), $('#translate-up-button'))
 
     setInterval(() => {
         let rollError  = parseFloat($('#roll > .error').innerText.slice(0, -1))
         let yawError   = parseFloat($('#yaw > .error').innerText.slice(0, -1))
         let pitchError = parseFloat($('#pitch > .error').innerText.slice(0, -1))
 
+        let xDistance  = parseFloat($('#x-range > .distance').innerText.slice(0, -1))
         let yDistance  = parseFloat($('#y-range > .distance').innerText.slice(0, -1))
         let zDistance  = parseFloat($('#z-range > .distance').innerText.slice(0, -1))
 
@@ -164,6 +184,7 @@ class ZController extends Controller {
         yawController.setError(yawError).adjust()
         pitchController.setError(pitchError).adjust()
 
+        xController.setError(xDistance).adjust()
         yController.setError(yDistance).adjust()
         zController.setError(zDistance).adjust()
     }, 500)
