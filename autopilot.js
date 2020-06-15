@@ -1,15 +1,17 @@
 class Controller {
-    constructor(config = {}) {
+    constructor(decreaseButton, increaseButton) {
         this.error          = 0
-        this.decreaseButton = config.decreaseButton
+        this.decreaseButton = decreaseButton
         this.decreasing     = false
-        this.increaseButton = config.increaseButton
+        this.increaseButton = increaseButton
         this.increasing     = false
         this.stopped        = false
     }
 
     setError(error) {
         this.error = error
+
+        return this
     }
 
     decrease() {
@@ -53,8 +55,8 @@ class Controller {
 }
 
 class RollController extends Controller {
-    constructor(config = {}) {
-        super(config)
+    constructor(decreaseButton, increaseButton) {
+        super(decreaseButton, increaseButton)
     }
 
     adjust() {
@@ -71,8 +73,26 @@ class RollController extends Controller {
 }
 
 class YAWController extends Controller {
-    constructor(config = {}) {
-        super(config)
+    constructor(decreaseButton, increaseButton) {
+        super(decreaseButton, increaseButton)
+    }
+
+    adjust() {
+        if (this.error >= -0.1 && this.error <= 0.1) {
+            this.stop()
+        }
+        else if (this.error < 0) {
+            this.decrease()
+        }
+        else if (this.error > 0) {
+            this.increase()
+        }
+    }
+}
+
+class PitchController extends Controller {
+    constructor(decreaseButton, increaseButton) {
+        super(decreaseButton, increaseButton)
     }
 
     adjust() {
@@ -89,24 +109,17 @@ class YAWController extends Controller {
 }
 
 (function() {
-    let rollController = new RollController({
-        decreaseButton: $('#roll-left-button'),
-        increaseButton: $('#roll-right-button')
-    })
-
-    let yawController = new YAWController({
-        decreaseButton: $('#yaw-right-button'),
-        increaseButton: $('#yaw-left-button')
-    })
+    let rollController  = new RollController($('#roll-left-button'), $('#roll-right-button'))
+    let yawController   = new YAWController($('#yaw-left-button'), $('#yaw-right-button'))
+    let pitchController = new PitchController($('#pitch-down-button'), $('#pitch-up-button'))
 
     setInterval(() => {
-        let rollError = parseFloat($('#roll > .error').innerText.slice(0, -1))
-        let yawError  = parseFloat($('#yaw > .error').innerText.slice(0, -1))
+        let rollError  = parseFloat($('#roll > .error').innerText.slice(0, -1))
+        let yawError   = parseFloat($('#yaw > .error').innerText.slice(0, -1))
+        let pitchError = parseFloat($('#pitch > .error').innerText.slice(0, -1))
 
-        rollController.setError(rollError)
-        rollController.adjust()
-
-        yawController.setError(yawError)
-        yawController.adjust()
+        rollController.setError(rollError).adjust()
+        yawController.setError(yawError).adjust()
+        pitchController.setError(pitchError).adjust()
     }, 500)
 })()
