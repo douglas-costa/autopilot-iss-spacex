@@ -92,24 +92,6 @@ class RightController extends Controller {
     }
 }
 
-class XController extends LeftController {
-    constructor(decreaseButton, increaseButton) {
-        super(decreaseButton, increaseButton)
-    }
-}
-
-class YController extends LeftController {
-    constructor(decreaseButton, increaseButton) {
-        super(decreaseButton, increaseButton)
-    }
-}
-
-class ZController extends LeftController {
-    constructor(decreaseButton, increaseButton) {
-        super(decreaseButton, increaseButton)
-    }
-}
-
 class RollController extends RightController {
     constructor(decreaseButton, increaseButton) {
         super(decreaseButton, increaseButton)
@@ -128,23 +110,51 @@ class PitchController extends RightController {
     }
 }
 
-(function() {
-    let rollController  = new RollController($('#roll-left-button'), $('#roll-right-button'))
-    let yawController   = new YAWController($('#yaw-left-button'), $('#yaw-right-button'))
-    let pitchController = new PitchController($('#pitch-up-button'), $('#pitch-down-button'))
+class XController extends LeftController {
+    constructor(decreaseButton, increaseButton) {
+        super(decreaseButton, increaseButton)
+    }
+}
 
-    let xController = new XController($('#translate-backward-button'), $('#translate-forward-button'))
-    let yController = new YController($('#translate-left-button'), $('#translate-right-button'))
-    let zController = new ZController($('#translate-down-button'), $('#translate-up-button'))
+class YController extends LeftController {
+    constructor(decreaseButton, increaseButton) {
+        super(decreaseButton, increaseButton)
+    }
+}
+
+class ZController extends LeftController {
+    constructor(decreaseButton, increaseButton) {
+        super(decreaseButton, increaseButton)
+    }
+}
+
+(function() {
+    const get = (target) => document.querySelector(target)
+
+    let rollController  = new RollController(get('#roll-left-button'), get('#roll-right-button'))
+    let yawController   = new YAWController(get('#yaw-left-button'), get('#yaw-right-button'))
+    let pitchController = new PitchController(get('#pitch-up-button'), get('#pitch-down-button'))
+
+    let xController = new XController(get('#translate-backward-button'), get('#translate-forward-button'))
+    let yController = new YController(get('#translate-left-button'), get('#translate-right-button'))
+    let zController = new ZController(get('#translate-down-button'), get('#translate-up-button'))
+
+    let rollErrorElement  = get('#roll > .error')
+    let yawErrorElement   = get('#yaw > .error')
+    let pitchErrorElement = get('#pitch > .error')
+
+    let xDistanceElement = get('#x-range > .distance')
+    let yDistanceElement = get('#y-range > .distance')
+    let zDistanceElement = get('#z-range > .distance')
 
     setInterval(() => {
-        let rollError  = parseFloat($('#roll > .error').innerText.slice(0, -1))
-        let yawError   = parseFloat($('#yaw > .error').innerText.slice(0, -1))
-        let pitchError = parseFloat($('#pitch > .error').innerText.slice(0, -1))
+        let rollError  = parseFloat(rollErrorElement.textContent.slice(0, -1))
+        let yawError   = parseFloat(yawErrorElement.textContent.slice(0, -1))
+        let pitchError = parseFloat(pitchErrorElement.textContent.slice(0, -1))
 
-        let xDistance  = parseFloat($('#x-range > .distance').innerText.slice(0, -1))
-        let yDistance  = parseFloat($('#y-range > .distance').innerText.slice(0, -1))
-        let zDistance  = parseFloat($('#z-range > .distance').innerText.slice(0, -1))
+        let xDistance = parseFloat(xDistanceElement.textContent.slice(0, -1))
+        let yDistance = parseFloat(yDistanceElement.textContent.slice(0, -1))
+        let zDistance = parseFloat(zDistanceElement.textContent.slice(0, -1))
 
         rollController.adjust(rollError)
         yawController.adjust(yawError)
