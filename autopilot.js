@@ -33,15 +33,15 @@ class LeftController extends Controller {
         this.decreasing = false
     }
 
-    adjust(error) {
-        if (error < 0) {
+    adjust(distance) {
+        if (distance < 0) {
             if (this.increasing) {
                 return
             }
 
             this.increase()
         }
-        else if (error > 0) {
+        else if (distance > 0) {
             if (this.decreasing) {
                 return
             }
@@ -92,24 +92,6 @@ class RightController extends Controller {
     }
 }
 
-class RollController extends RightController {
-    constructor(decreaseButton, increaseButton) {
-        super(decreaseButton, increaseButton)
-    }
-}
-
-class YAWController extends RightController {
-    constructor(decreaseButton, increaseButton) {
-        super(decreaseButton, increaseButton)
-    }
-}
-
-class PitchController extends RightController {
-    constructor(decreaseButton, increaseButton) {
-        super(decreaseButton, increaseButton)
-    }
-}
-
 class XController extends LeftController {
     constructor(decreaseButton, increaseButton) {
         super(decreaseButton, increaseButton)
@@ -128,40 +110,58 @@ class ZController extends LeftController {
     }
 }
 
+class RollController extends RightController {
+    constructor(decreaseButton, increaseButton) {
+        super(decreaseButton, increaseButton)
+    }
+}
+
+class YAWController extends RightController {
+    constructor(decreaseButton, increaseButton) {
+        super(decreaseButton, increaseButton)
+    }
+}
+
+class PitchController extends RightController {
+    constructor(decreaseButton, increaseButton) {
+        super(decreaseButton, increaseButton)
+    }
+}
+
 (function() {
     const get = (target) => document.querySelector(target)
-
-    let rollController  = new RollController(get('#roll-left-button'), get('#roll-right-button'))
-    let yawController   = new YAWController(get('#yaw-left-button'), get('#yaw-right-button'))
-    let pitchController = new PitchController(get('#pitch-up-button'), get('#pitch-down-button'))
 
     let xController = new XController(get('#translate-backward-button'), get('#translate-forward-button'))
     let yController = new YController(get('#translate-left-button'), get('#translate-right-button'))
     let zController = new ZController(get('#translate-down-button'), get('#translate-up-button'))
 
-    let rollErrorElement  = get('#roll > .error')
-    let yawErrorElement   = get('#yaw > .error')
-    let pitchErrorElement = get('#pitch > .error')
+    let rollController  = new RollController(get('#roll-left-button'), get('#roll-right-button'))
+    let yawController   = new YAWController(get('#yaw-left-button'), get('#yaw-right-button'))
+    let pitchController = new PitchController(get('#pitch-up-button'), get('#pitch-down-button'))
 
     let xDistanceElement = get('#x-range > .distance')
     let yDistanceElement = get('#y-range > .distance')
     let zDistanceElement = get('#z-range > .distance')
 
-    setInterval(() => {
-        let rollError  = parseFloat(rollErrorElement.textContent)
-        let yawError   = parseFloat(yawErrorElement.textContent)
-        let pitchError = parseFloat(pitchErrorElement.textContent)
+    let rollErrorElement  = get('#roll > .error')
+    let yawErrorElement   = get('#yaw > .error')
+    let pitchErrorElement = get('#pitch > .error')
 
+    setInterval(() => {
         let xDistance = parseFloat(xDistanceElement.textContent)
         let yDistance = parseFloat(yDistanceElement.textContent)
         let zDistance = parseFloat(zDistanceElement.textContent)
 
-        rollController.adjust(rollError)
-        yawController.adjust(yawError)
-        pitchController.adjust(pitchError)
+        let rollError  = parseFloat(rollErrorElement.textContent)
+        let yawError   = parseFloat(yawErrorElement.textContent)
+        let pitchError = parseFloat(pitchErrorElement.textContent)
 
         xController.adjust(xDistance)
         yController.adjust(yDistance)
         zController.adjust(zDistance)
+        
+        rollController.adjust(rollError)
+        yawController.adjust(yawError)
+        pitchController.adjust(pitchError)
     }, 250)
 })()
