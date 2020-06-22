@@ -1,44 +1,65 @@
 class Controller {
     constructor(decreaseButton, increaseButton) {
-        this.error          = 0
         this.decreaseButton = decreaseButton
         this.decreasing     = false
         this.increaseButton = increaseButton
         this.increasing     = false
-        this.stopped        = false
-    }
-
-    setError(error) {
-        this.error = error
-
-        return this
     }
 
     decrease() {
-        if (this.decreasing) {
-            return
-        }
-
         this.decreasing = true
-        this.increasing = false
         this.decreaseButton.click()
     }
 
     increase() {
-        if (this.increasing) {
-            return
-        }
-
         this.increasing = true
-        this.decreasing = false
         this.increaseButton.click()
     }
 
     stop() {
-        if (this.stopped) {
-            return
-        }
+    }
 
+    adjust() {
+    }
+}
+
+class LeftController extends Controller {
+    constructor(decreaseButton, increaseButton) {
+        super(decreaseButton, increaseButton)
+    }
+
+    stop() {
+        this.increasing = false
+        this.decreasing = false
+    }
+
+    adjust(error) {
+        if (error < 0) {
+            if (this.increasing) {
+                return
+            }
+
+            this.increase()
+        }
+        else if (error > 0) {
+            if (this.decreasing) {
+                return
+            }
+
+            this.decrease()
+        }
+        else {
+            this.stop()
+        }
+    }
+}
+
+class RightController extends Controller {
+    constructor(decreaseButton, increaseButton) {
+        super(decreaseButton, increaseButton)
+    }
+
+    stop() {
         if (this.increasing) {
             this.decreaseButton.click()
         }
@@ -46,126 +67,71 @@ class Controller {
             this.increaseButton.click()
         }
 
-        this.decreasing = false
         this.increasing = false
-        this.stopped    = true
+        this.decreasing = false
     }
 
-    adjust() {}
-}
+    adjust(error) {
+        if (error < 0) {
+            if (this.decreasing) {
+                return
+            }
 
-class RollController extends Controller {
-    constructor(decreaseButton, increaseButton) {
-        super(decreaseButton, increaseButton)
-    }
-
-    adjust() {
-        if (this.error >= -0.1 && this.error <= 0.1) {
-            this.stop()
-        }
-        else if (this.error < 0) {
             this.decrease()
         }
-        else if (this.error > 0) {
+        else if (error > 0) {
+            if (this.increasing) {
+                return
+            }
+
             this.increase()
         }
-    }
-}
-
-class YAWController extends Controller {
-    constructor(decreaseButton, increaseButton) {
-        super(decreaseButton, increaseButton)
-    }
-
-    adjust() {
-        if (this.error >= -0.1 && this.error <= 0.1) {
+        else {
             this.stop()
-        }
-        else if (this.error < 0) {
-            this.decrease()
-        }
-        else if (this.error > 0) {
-            this.increase()
         }
     }
 }
 
-class PitchController extends Controller {
+class XController extends LeftController {
     constructor(decreaseButton, increaseButton) {
         super(decreaseButton, increaseButton)
-    }
-
-    adjust() {
-        if (this.error >= -0.1 && this.error <= 0.1) {
-            this.stop()
-        }
-        else if (this.error < 0) {
-            this.increase()
-        }
-        else if (this.error > 0) {
-            this.decrease()
-        }
     }
 }
 
-class XController extends Controller {
+class YController extends LeftController {
     constructor(decreaseButton, increaseButton) {
         super(decreaseButton, increaseButton)
-    }
-
-    adjust() {
-        if (this.error >= -0.1 && this.error <= 0.1) {
-            this.stop()
-        }
-        else if (this.error < 0) {
-            this.decrease()
-        }
-        else if (this.error > 0) {
-            this.increase()
-        }
     }
 }
 
-class YController extends Controller {
+class ZController extends LeftController {
     constructor(decreaseButton, increaseButton) {
         super(decreaseButton, increaseButton)
-    }
-
-    adjust() {
-        if (this.error >= -0.1 && this.error <= 0.1) {
-            this.stop()
-        }
-        else if (this.error < 0) {
-            this.increase()
-        }
-        else if (this.error > 0) {
-            this.decrease()
-        }
     }
 }
 
-class ZController extends Controller {
+class RollController extends RightController {
     constructor(decreaseButton, increaseButton) {
         super(decreaseButton, increaseButton)
     }
+}
 
-    adjust() {
-        if (this.error >= -0.1 && this.error <= 0.1) {
-            this.stop()
-        }
-        else if (this.error < 0) {
-            this.increase()
-        }
-        else if (this.error > 0) {
-            this.decrease()
-        }
+class YAWController extends RightController {
+    constructor(decreaseButton, increaseButton) {
+        super(decreaseButton, increaseButton)
+    }
+}
+
+class PitchController extends RightController {
+    constructor(decreaseButton, increaseButton) {
+        super(decreaseButton, increaseButton)
     }
 }
 
 (function() {
     let rollController  = new RollController($('#roll-left-button'), $('#roll-right-button'))
     let yawController   = new YAWController($('#yaw-left-button'), $('#yaw-right-button'))
-    let pitchController = new PitchController($('#pitch-down-button'), $('#pitch-up-button'))
+    let pitchController = new PitchController($('#pitch-up-button'), $('#pitch-down-button'))
 
     let xController = new XController($('#translate-backward-button'), $('#translate-forward-button'))
     let yController = new YController($('#translate-left-button'), $('#translate-right-button'))
@@ -180,12 +146,12 @@ class ZController extends Controller {
         let yDistance  = parseFloat($('#y-range > .distance').innerText.slice(0, -1))
         let zDistance  = parseFloat($('#z-range > .distance').innerText.slice(0, -1))
 
-        rollController.setError(rollError).adjust()
-        yawController.setError(yawError).adjust()
-        pitchController.setError(pitchError).adjust()
+        rollController.adjust(rollError)
+        yawController.adjust(yawError)
+        pitchController.adjust(pitchError)
 
-        xController.setError(xDistance).adjust()
-        yController.setError(yDistance).adjust()
-        zController.setError(zDistance).adjust()
-    }, 500)
+        xController.adjust(xDistance)
+        yController.adjust(yDistance)
+        zController.adjust(zDistance)
+    }, 250)
 })()
