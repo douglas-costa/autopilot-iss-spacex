@@ -148,13 +148,13 @@ class ZController extends LeftController {
     let zDistanceElement = get('#z-range > .distance')
 
     setInterval(() => {
-        let rollError  = parseFloat(rollErrorElement.textContent.slice(0, -1))
-        let yawError   = parseFloat(yawErrorElement.textContent.slice(0, -1))
-        let pitchError = parseFloat(pitchErrorElement.textContent.slice(0, -1))
+        let rollError  = parseFloat(rollErrorElement.textContent)
+        let yawError   = parseFloat(yawErrorElement.textContent)
+        let pitchError = parseFloat(pitchErrorElement.textContent)
 
-        let xDistance = parseFloat(xDistanceElement.textContent.slice(0, -1))
-        let yDistance = parseFloat(yDistanceElement.textContent.slice(0, -1))
-        let zDistance = parseFloat(zDistanceElement.textContent.slice(0, -1))
+        let xDistance = parseFloat(xDistanceElement.textContent)
+        let yDistance = parseFloat(yDistanceElement.textContent)
+        let zDistance = parseFloat(zDistanceElement.textContent)
 
         rollController.adjust(rollError)
         yawController.adjust(yawError)
